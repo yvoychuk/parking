@@ -1,4 +1,7 @@
+import React from "react"
+import ReactDOM from "react-dom"
 import Utils from "./utils.js"
+import Index from "./views/index.js"
 
 const Main = (function (){
 
@@ -18,13 +21,16 @@ const Main = (function (){
   }
 
   const getStorage = function () {
-    var parking = localStorage.getItem("parking");
-    console.log(JSON.parse(parking)[0])
+    var storage = {
+      parking: JSON.parse(localStorage.getItem("parking"))
+    };
+    return storage;
   }
 
   const run = function (config) {
     createStorage(config);
-    getStorage()
+    var storage = getStorage();
+    ReactDOM.render(<Index parking={storage.parking} />, document.getElementById("main"));
   }
 
   return {
