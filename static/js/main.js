@@ -73,7 +73,70 @@
 "use strict";
 
 
-console.log("foo");
+var _utils = __webpack_require__(1);
+
+var _utils2 = _interopRequireDefault(_utils);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Main = function () {
+
+  var createStorage = function createStorage(config) {
+    var parking = [];
+    var placesAvailable = config.placesAvailable,
+        forInv = config.forInv,
+        forTrucks = config.forTrucks;
+
+    for (var i = 0; i < placesAvailable; i++) {
+      parking.push({
+        id: _utils2.default.genID(),
+        type: i < forInv ? "A" : i < forInv + forTrucks ? "B" : "C",
+        available: true,
+        created: Date.now(),
+        updated: null
+      });
+    };
+    localStorage.setItem("parking", JSON.stringify(parking));
+  };
+
+  var getStorage = function getStorage() {
+    var parking = localStorage.getItem("parking");
+    console.log(JSON.parse(parking)[0]);
+  };
+
+  var _run = function _run(config) {
+    createStorage(config);
+    getStorage();
+  };
+
+  return {
+    run: function run(config) {
+      _run(config);
+    }
+
+  };
+}();
+
+// api
+window.parking = Main;
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var Utils = function () {
+
+  return {
+    genID: function genID() {
+      return Math.random().toString(36).substr(2, 9);
+    }
+  };
+}();
+
+module.exports = Utils;
 
 /***/ })
 /******/ ]);
