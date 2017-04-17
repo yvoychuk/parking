@@ -209,7 +209,8 @@ var Index = function (_React$Component) {
 
     _this.state = {
       parking: props.parking,
-      selected: "disabled"
+      itemToAdd: "disabled",
+      itemToRemove: "disabled"
     };
     return _this;
   }
@@ -243,35 +244,63 @@ var Index = function (_React$Component) {
       return slots;
     }
   }, {
-    key: "handlePark",
-    value: function handlePark() {
+    key: "addItem",
+    value: function addItem() {
       var _state = this.state,
           parking = _state.parking,
-          selected = _state.selected;
+          itemToAdd = _state.itemToAdd;
 
-      var slotsAvailable = window.parking.getFreeSlots(selected);
+      var slotsAvailable = window.parking.getFreeSlots(itemToAdd);
       var isSet = false;
       if (slotsAvailable.length > 0) {
         parking = parking.map(function (slot) {
-          if (!isSet && slot.type === selected && slot.available) {
+          if (!isSet && slot.type === itemToAdd && slot.available) {
             isSet = true;
             slot.available = false;
-            slot.usedBy = selected;
+            slot.usedBy = itemToAdd;
             slot.updated = Date.now();
           }
           return slot;
         });
       }
-      var _that = this;
       this.setState({ parking: parking }, function () {
         localStorage.setItem("parking", JSON.stringify(parking));
       });
     }
   }, {
-    key: "handleChange",
-    value: function handleChange(e) {
+    key: "selectItemToAdd",
+    value: function selectItemToAdd(e) {
       var value = e.target.value;
-      this.setState({ selected: value });
+      this.setState({ itemToAdd: value });
+    }
+  }, {
+    key: "removeItem",
+    value: function removeItem() {
+      var _state2 = this.state,
+          parking = _state2.parking,
+          itemToRemove = _state2.itemToRemove;
+
+      var slots = parking.filter(function (slot) {
+        return slot.usedBy === itemToRemove;
+      });
+      slots = slots.map(function (slot, index) {
+        if (index === slots.length - 1) {
+          slot.available = true;
+          slot.usedBy = "";
+          slot.updated = Date.now();
+        };
+        return slot;
+      });
+      Object.assign(parking, slots);
+      this.setState({ parking: parking }, function () {
+        localStorage.setItem("parking", JSON.stringify(parking));
+      });
+    }
+  }, {
+    key: "selectItemToRemove",
+    value: function selectItemToRemove(e) {
+      var value = e.target.value;
+      this.setState({ itemToRemove: value });
     }
   }, {
     key: "render",
@@ -311,7 +340,7 @@ var Index = function (_React$Component) {
             ),
             _react2.default.createElement(
               "select",
-              { onChange: this.handleChange.bind(this), selected: this.state.selected },
+              { onChange: this.selectItemToAdd.bind(this), selected: this.state.selected },
               _react2.default.createElement(
                 "option",
                 { value: "disabled" },
@@ -330,7 +359,7 @@ var Index = function (_React$Component) {
             ),
             _react2.default.createElement(
               "button",
-              { onClick: this.handlePark.bind(this) },
+              { onClick: this.addItem.bind(this) },
               "park"
             )
           ),
@@ -344,7 +373,7 @@ var Index = function (_React$Component) {
             ),
             _react2.default.createElement(
               "select",
-              { selected: this.state.selected },
+              { onChange: this.selectItemToRemove.bind(this), selected: this.state.selected },
               _react2.default.createElement(
                 "option",
                 { value: "disabled" },
@@ -363,7 +392,7 @@ var Index = function (_React$Component) {
             ),
             _react2.default.createElement(
               "button",
-              null,
+              { onClick: this.removeItem.bind(this) },
               "remove"
             )
           )

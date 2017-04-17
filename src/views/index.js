@@ -6,7 +6,8 @@ class Index extends React.Component {
     super();
     this.state = {
       parking: props.parking,
-      selected: "disabled"
+      itemToAdd: "disabled",
+      itemToRemove: "disabled"
     };
   }
 
@@ -30,32 +31,61 @@ class Index extends React.Component {
     return slots;
   }
 
-  handlePark () {
-    var {parking, selected} = this.state;
-    var slotsAvailable = window.parking.getFreeSlots(selected);
+  addItem () {
+    var {parking, itemToAdd} = this.state;
+    var slotsAvailable = window.parking.getFreeSlots(itemToAdd);
     var isSet = false;
     if (slotsAvailable.length > 0) {
       parking = parking.map(function (slot) {
-        if (! isSet && (slot.type === selected) && slot.available) {
+        if (! isSet && (slot.type === itemToAdd) && slot.available) {
           isSet = true;
           slot.available = false;
-          slot.usedBy = selected;
+          slot.usedBy = itemToAdd;
           slot.updated = Date.now();
         }
-        return slot
+        return slot;
       })
     }
-    let _that = this;
     this.setState(
       {parking: parking},
       function () {
         localStorage.setItem("parking", JSON.stringify(parking))
-      })
+      }
+    )
   }
 
-  handleChange (e) {
+  selectItemToAdd (e) {
     let value = e.target.value;
-    this.setState({selected: value});
+    this.setState({itemToAdd: value});
+  }
+
+  removeItem () {
+    var {parking, itemToRemove} = this.state;
+    var slots = parking.filter(function (slot) {
+      return slot.usedBy === itemToRemove;
+    });
+    slots = slots.map(
+      function (slot, index) {
+        if (index === (slots.length - 1)) {
+          slot.available = true;
+          slot.usedBy = "";
+          slot.updated = Date.now();
+        };
+        return slot;
+      }
+    )
+    Object.assign(parking, slots);
+    this.setState(
+      {parking: parking},
+      function () {
+        localStorage.setItem("parking", JSON.stringify(parking))
+      }
+    )
+  }
+
+  selectItemToRemove (e) {
+    let value = e.target.value;
+    this.setState({itemToRemove: value});
   }
 
   render () {
@@ -71,21 +101,21 @@ class Index extends React.Component {
         <div className="col-6 interface">
           <div>
             <p>Park new car</p>
-            <select onChange={this.handleChange.bind(this)} selected={this.state.selected}>
+            <select onChange={this.selectItemToAdd.bind(this)} selected={this.state.selected}>
               <option value="disabled">disabled</option>
               <option value="sedan">sedan</option>
               <option value="truck">truck</option>
             </select>
-            <button onClick={this.handlePark.bind(this)}>park</button>
+            <button onClick={this.addItem.bind(this)}>park</button>
           </div>
           <div>
             <p>Remove car</p>
-            <select selected={this.state.selected}>
+            <select onChange={this.selectItemToRemove.bind(this)} selected={this.state.selected}>
               <option value="disabled">disabled</option>
               <option value="sedan">sedan</option>
               <option value="truck">truck</option>
             </select>
-            <button>remove</button>
+            <button onClick={this.removeItem.bind(this)}>remove</button>
           </div>
         </div>
       </div>)
