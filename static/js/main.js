@@ -100,7 +100,7 @@ var Main = function () {
         truck = config.truck;
 
     for (var i = 0; i < available; i++) {
-      var type = i < disabled ? "disabled" : i < disabled + truck ? "truck" : "all";
+      var type = i < disabled ? "disabled" : i < disabled + truck ? "truck" : "sedan";
       var typeID = i < disabled ? 0 : i < disabled + truck ? 1 : 2;
       parking.push({
         id: _utils2.default.genID(),
@@ -113,7 +113,7 @@ var Main = function () {
         updated: null
       });
     };
-    if (getStorage("item") === null) {
+    if (getStorage().parking === null) {
       localStorage.setItem("parking", JSON.stringify(parking));
     }
   };
@@ -225,9 +225,19 @@ var Index = function (_React$Component) {
         slots.push(_react2.default.createElement(
           "div",
           { key: "slot-" + i, className: "p-slot" },
+          "number: " + slot.number,
+          ",\xA0",
           "type: " + slot.type,
           ",\xA0",
-          slot.available ? "available" : "not available"
+          slot.available ? _react2.default.createElement(
+            "span",
+            { className: "text success" },
+            "available"
+          ) : _react2.default.createElement(
+            "span",
+            { className: "text danger" },
+            "not available, used by:" + slot.usedBy
+          )
         ));
       }
       return slots;
@@ -240,11 +250,10 @@ var Index = function (_React$Component) {
           selected = _state.selected;
 
       var slotsAvailable = window.parking.getFreeSlots(selected);
-      console.log(slotsAvailable);
       var isSet = false;
       if (slotsAvailable.length > 0) {
         parking = parking.map(function (slot) {
-          if (!isSet && slot.type === selected) {
+          if (!isSet && slot.type === selected && slot.available) {
             isSet = true;
             slot.available = false;
             slot.usedBy = selected;
@@ -272,7 +281,16 @@ var Index = function (_React$Component) {
         { className: "container" },
         _react2.default.createElement(
           "div",
-          { className: "slots" },
+          { className: "col-12" },
+          _react2.default.createElement(
+            "h1",
+            null,
+            "Parking"
+          )
+        ),
+        _react2.default.createElement(
+          "div",
+          { className: "col-6 slots" },
           _react2.default.createElement(
             "h2",
             null,
@@ -282,35 +300,72 @@ var Index = function (_React$Component) {
         ),
         _react2.default.createElement(
           "div",
-          { className: "interface" },
+          { className: "col-6 interface" },
           _react2.default.createElement(
-            "p",
+            "div",
             null,
-            "select type"
-          ),
-          _react2.default.createElement(
-            "select",
-            { onChange: this.handleChange.bind(this), selected: this.state.selected, id: "type-selector" },
             _react2.default.createElement(
-              "option",
-              { value: "disabled" },
-              "disabled"
+              "p",
+              null,
+              "Park new car"
             ),
             _react2.default.createElement(
-              "option",
-              { value: "all" },
-              "sedan"
+              "select",
+              { onChange: this.handleChange.bind(this), selected: this.state.selected },
+              _react2.default.createElement(
+                "option",
+                { value: "disabled" },
+                "disabled"
+              ),
+              _react2.default.createElement(
+                "option",
+                { value: "sedan" },
+                "sedan"
+              ),
+              _react2.default.createElement(
+                "option",
+                { value: "truck" },
+                "truck"
+              )
             ),
             _react2.default.createElement(
-              "option",
-              { value: "truck" },
-              "truck"
+              "button",
+              { onClick: this.handlePark.bind(this) },
+              "park"
             )
           ),
           _react2.default.createElement(
-            "button",
-            { onClick: this.handlePark.bind(this) },
-            "park"
+            "div",
+            null,
+            _react2.default.createElement(
+              "p",
+              null,
+              "Remove car"
+            ),
+            _react2.default.createElement(
+              "select",
+              { selected: this.state.selected },
+              _react2.default.createElement(
+                "option",
+                { value: "disabled" },
+                "disabled"
+              ),
+              _react2.default.createElement(
+                "option",
+                { value: "sedan" },
+                "sedan"
+              ),
+              _react2.default.createElement(
+                "option",
+                { value: "truck" },
+                "truck"
+              )
+            ),
+            _react2.default.createElement(
+              "button",
+              null,
+              "remove"
+            )
           )
         )
       );

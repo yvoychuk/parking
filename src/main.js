@@ -9,7 +9,7 @@ const Main = (function (){
     var parking = [];
     var {available, disabled, truck} = config;
     for (let i = 0; i < available; i++) {
-      let type = i < disabled ? "disabled" : ( i < (disabled + truck) ? "truck" : "all");
+      let type = i < disabled ? "disabled" : ( i < (disabled + truck) ? "truck" : "sedan");
       let typeID = i < disabled ? 0 : ( i < (disabled + truck) ? 1 : 2);
       parking.push({
         id: Utils.genID(),
@@ -22,7 +22,7 @@ const Main = (function (){
         updated: null
       })
     };
-    if (getStorage("item") === null) {
+    if (getStorage().parking === null) {
       localStorage.setItem("parking", JSON.stringify(parking))
     }
   }
