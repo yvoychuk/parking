@@ -1,3 +1,7 @@
+run:  
+- npm install  
+- npm start  
+  
 done:  
 - basic project structure  
 - basic server routing  
