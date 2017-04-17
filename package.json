@@ -1,0 +1,12 @@
+{
+  "name": "parking",
+  "version": "1.0.0",
+  "description": "test",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "yvoychuk",
+  "license": "ISC"
+}
