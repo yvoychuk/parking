@@ -61,12 +61,11 @@ class Index extends React.Component {
 
   removeItem () {
     var {parking, itemToRemove} = this.state;
-    var slots = parking.filter(function (slot) {
-      return slot.usedBy === itemToRemove;
-    });
-    slots = slots.map(
-      function (slot, index) {
-        if (index === (slots.length - 1)) {
+    let isSet = false;
+    parking = parking.map(
+      function (slot) {
+        if (! isSet && slot.usedBy === itemToRemove) {
+          isSet = true;
           slot.available = true;
           slot.usedBy = "";
           slot.updated = Date.now();
@@ -74,7 +73,6 @@ class Index extends React.Component {
         return slot;
       }
     )
-    Object.assign(parking, slots);
     this.setState(
       {parking: parking},
       function () {
@@ -84,6 +82,7 @@ class Index extends React.Component {
   }
 
   selectItemToRemove (e) {
+    // no validation
     let value = e.target.value;
     this.setState({itemToRemove: value});
   }
@@ -106,6 +105,7 @@ class Index extends React.Component {
               <option value="sedan">sedan</option>
               <option value="truck">truck</option>
             </select>
+            <br/>
             <button onClick={this.addItem.bind(this)}>park</button>
           </div>
           <div>

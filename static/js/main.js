@@ -280,18 +280,16 @@ var Index = function (_React$Component) {
           parking = _state2.parking,
           itemToRemove = _state2.itemToRemove;
 
-      var slots = parking.filter(function (slot) {
-        return slot.usedBy === itemToRemove;
-      });
-      slots = slots.map(function (slot, index) {
-        if (index === slots.length - 1) {
+      var isSet = false;
+      parking = parking.map(function (slot) {
+        if (!isSet && slot.usedBy === itemToRemove) {
+          isSet = true;
           slot.available = true;
           slot.usedBy = "";
           slot.updated = Date.now();
         };
         return slot;
       });
-      Object.assign(parking, slots);
       this.setState({ parking: parking }, function () {
         localStorage.setItem("parking", JSON.stringify(parking));
       });
@@ -299,6 +297,7 @@ var Index = function (_React$Component) {
   }, {
     key: "selectItemToRemove",
     value: function selectItemToRemove(e) {
+      // no validation
       var value = e.target.value;
       this.setState({ itemToRemove: value });
     }
@@ -357,6 +356,7 @@ var Index = function (_React$Component) {
                 "truck"
               )
             ),
+            _react2.default.createElement("br", null),
             _react2.default.createElement(
               "button",
               { onClick: this.addItem.bind(this) },
