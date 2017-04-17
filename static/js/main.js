@@ -107,13 +107,15 @@ var Main = function () {
         number: i,
         typeID: typeID,
         type: type,
-        usedBy: undefined,
+        usedBy: "",
         available: true,
         created: Date.now(),
         updated: null
       });
     };
-    localStorage.setItem("parking", JSON.stringify(parking));
+    if (getStorage("item") === null) {
+      localStorage.setItem("parking", JSON.stringify(parking));
+    }
   };
 
   var getStorage = function getStorage() {
@@ -200,12 +202,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Index = function (_React$Component) {
   _inherits(Index, _React$Component);
 
-  function Index() {
+  function Index(props) {
     _classCallCheck(this, Index);
 
     var _this = _possibleConstructorReturn(this, (Index.__proto__ || Object.getPrototypeOf(Index)).call(this));
 
     _this.state = {
+      parking: props.parking,
       selected: "disabled"
     };
     return _this;
@@ -232,13 +235,33 @@ var Index = function (_React$Component) {
   }, {
     key: "handlePark",
     value: function handlePark() {
-      console.log(this.state.selected);
+      var _state = this.state,
+          parking = _state.parking,
+          selected = _state.selected;
+
+      var slotsAvailable = window.parking.getFreeSlots(selected);
+      console.log(slotsAvailable);
+      var isSet = false;
+      if (slotsAvailable.length > 0) {
+        parking = parking.map(function (slot) {
+          if (!isSet && slot.type === selected) {
+            isSet = true;
+            slot.available = false;
+            slot.usedBy = selected;
+            slot.updated = Date.now();
+          }
+          return slot;
+        });
+      }
+      var _that = this;
+      this.setState({ parking: parking }, function () {
+        localStorage.setItem("parking", JSON.stringify(parking));
+      });
     }
   }, {
     key: "handleChange",
     value: function handleChange(e) {
       var value = e.target.value;
-      console.log();
       this.setState({ selected: value });
     }
   }, {
@@ -275,7 +298,7 @@ var Index = function (_React$Component) {
             ),
             _react2.default.createElement(
               "option",
-              { value: "sedan" },
+              { value: "all" },
               "sedan"
             ),
             _react2.default.createElement(

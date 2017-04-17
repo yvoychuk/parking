@@ -16,13 +16,15 @@ const Main = (function (){
         number: i,
         typeID: typeID,
         type: type,
-        usedBy: undefined,
+        usedBy: "",
         available: true,
         created: Date.now(),
         updated: null
       })
     };
-    localStorage.setItem("parking", JSON.stringify(parking))
+    if (getStorage("item") === null) {
+      localStorage.setItem("parking", JSON.stringify(parking))
+    }
   }
 
   const getStorage = function () {

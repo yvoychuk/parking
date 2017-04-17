@@ -2,9 +2,10 @@ import React from "react"
 
 class Index extends React.Component {
 
-  constructor () {
+  constructor (props) {
     super();
     this.state = {
+      parking: props.parking,
       selected: "disabled"
     };
   }
@@ -25,12 +26,31 @@ class Index extends React.Component {
   }
 
   handlePark () {
-    console.log(this.state.selected)
+    var {parking, selected} = this.state;
+    var slotsAvailable = window.parking.getFreeSlots(selected);
+    console.log(slotsAvailable)
+    var isSet = false;
+    if (slotsAvailable.length > 0) {
+      parking = parking.map(function (slot) {
+        if (! isSet && slot.type === selected) {
+          isSet = true;
+          slot.available = false;
+          slot.usedBy = selected;
+          slot.updated = Date.now()
+        }
+        return slot
+      })
+    }
+    let _that = this;
+    this.setState(
+      {parking: parking},
+      function () {
+        localStorage.setItem("parking", JSON.stringify(parking))
+      })
   }
 
   handleChange (e) {
     let value = e.target.value;
-    console.log()
     this.setState({selected: value});
   }
 
@@ -45,7 +65,7 @@ class Index extends React.Component {
           <p>select type</p>
           <select onChange={this.handleChange.bind(this)} selected={this.state.selected} id="type-selector">
             <option value="disabled">disabled</option>
-            <option value="sedan">sedan</option>
+            <option value="all">sedan</option>
             <option value="truck">truck</option>
           </select>
           <button onClick={this.handlePark.bind(this)}>park</button>
