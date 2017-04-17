@@ -1,6 +1,7 @@
 run:  
 - npm install  
 - npm start  
+- http://localhost:3019/  
   
 done:  
 - basic project structure  
