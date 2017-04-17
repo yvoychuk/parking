@@ -95,14 +95,19 @@ var Main = function () {
 
   var createStorage = function createStorage(config) {
     var parking = [];
-    var placesAvailable = config.placesAvailable,
-        forInv = config.forInv,
-        forTrucks = config.forTrucks;
+    var available = config.available,
+        disabled = config.disabled,
+        truck = config.truck;
 
-    for (var i = 0; i < placesAvailable; i++) {
+    for (var i = 0; i < available; i++) {
+      var type = i < disabled ? "disabled" : i < disabled + truck ? "truck" : "all";
+      var typeID = i < disabled ? 0 : i < disabled + truck ? 1 : 2;
       parking.push({
         id: _utils2.default.genID(),
-        type: i < forInv ? "A" : i < forInv + forTrucks ? "B" : "C",
+        number: i,
+        typeID: typeID,
+        type: type,
+        usedBy: undefined,
         available: true,
         created: Date.now(),
         updated: null
@@ -127,8 +132,21 @@ var Main = function () {
   return {
     run: function run(config) {
       _run(config);
-    }
+    },
+    getFreeSlots: function getFreeSlots(type) {
+      var _getStorage = getStorage(),
+          parking = _getStorage.parking;
 
+      return parking.filter(function (slot) {
+        if (typeof type === "undefined") {
+          return slot.available;
+        } else {
+          return slot.available && slot.type === type;
+        }
+      }).map(function (slot) {
+        return slot.type + ": " + slot.number;
+      });
+    }
   };
 }();
 
@@ -185,7 +203,12 @@ var Index = function (_React$Component) {
   function Index() {
     _classCallCheck(this, Index);
 
-    return _possibleConstructorReturn(this, (Index.__proto__ || Object.getPrototypeOf(Index)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (Index.__proto__ || Object.getPrototypeOf(Index)).call(this));
+
+    _this.state = {
+      selected: "disabled"
+    };
+    return _this;
   }
 
   _createClass(Index, [{
@@ -207,12 +230,66 @@ var Index = function (_React$Component) {
       return slots;
     }
   }, {
+    key: "handlePark",
+    value: function handlePark() {
+      console.log(this.state.selected);
+    }
+  }, {
+    key: "handleChange",
+    value: function handleChange(e) {
+      var value = e.target.value;
+      console.log();
+      this.setState({ selected: value });
+    }
+  }, {
     key: "render",
     value: function render() {
       return _react2.default.createElement(
         "div",
-        { className: "p-slots" },
-        this.r_slots()
+        { className: "container" },
+        _react2.default.createElement(
+          "div",
+          { className: "slots" },
+          _react2.default.createElement(
+            "h2",
+            null,
+            "Parking slots"
+          ),
+          this.r_slots()
+        ),
+        _react2.default.createElement(
+          "div",
+          { className: "interface" },
+          _react2.default.createElement(
+            "p",
+            null,
+            "select type"
+          ),
+          _react2.default.createElement(
+            "select",
+            { onChange: this.handleChange.bind(this), selected: this.state.selected, id: "type-selector" },
+            _react2.default.createElement(
+              "option",
+              { value: "disabled" },
+              "disabled"
+            ),
+            _react2.default.createElement(
+              "option",
+              { value: "sedan" },
+              "sedan"
+            ),
+            _react2.default.createElement(
+              "option",
+              { value: "truck" },
+              "truck"
+            )
+          ),
+          _react2.default.createElement(
+            "button",
+            { onClick: this.handlePark.bind(this) },
+            "park"
+          )
+        )
       );
     }
   }]);

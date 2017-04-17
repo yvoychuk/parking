@@ -1,13 +1,15 @@
 <html>
-  <head></head>
+  <head>
+    <link rel="stylesheet" type="text/css" href="./css/styles.css" />
+  </head>
   <body>
     <div id="main"></div>
     <script src="/js/main.js"></script>
     <script type="text/javascript">
       window.parking.run({
-        placesAvailable: 30,
-        forInv: 5,
-        forTrucks: 15
+        available: 30,
+        disabled: 5,
+        truck: 15
       });
     </script>
   </body>

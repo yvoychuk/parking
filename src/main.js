@@ -7,11 +7,16 @@ const Main = (function (){
 
   const createStorage = function (config) {
     var parking = [];
-    var {placesAvailable, forInv, forTrucks} = config;
-    for (let i = 0; i < placesAvailable; i++) {
+    var {available, disabled, truck} = config;
+    for (let i = 0; i < available; i++) {
+      let type = i < disabled ? "disabled" : ( i < (disabled + truck) ? "truck" : "all");
+      let typeID = i < disabled ? 0 : ( i < (disabled + truck) ? 1 : 2);
       parking.push({
         id: Utils.genID(),
-        type: i < forInv ? "A" : ( i < (forInv + forTrucks) ? "B" : "C"),
+        number: i,
+        typeID: typeID,
+        type: type,
+        usedBy: undefined,
         available: true,
         created: Date.now(),
         updated: null
@@ -36,8 +41,22 @@ const Main = (function (){
   return {
     run: function (config) {
       run(config);
+    },
+    getFreeSlots: function (type) {
+      var {parking} = getStorage();
+      return parking.filter(
+        function (slot) {
+          if (typeof type === "undefined") {
+            return slot.available
+          } else {
+            return slot.available && slot.type === type
+          }
+        }).map(
+        function (slot) {
+          return slot.type + ": " + slot.number
+        }
+      );
     }
-
   }
 
 })();
